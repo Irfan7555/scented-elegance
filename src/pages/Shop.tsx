@@ -2,23 +2,30 @@ import { useParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { perfumes, categories } from "@/lib/data";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 const Shop = () => {
   const { category } = useParams();
-  
-  const filteredPerfumes = category && category !== 'all'
-    ? perfumes.filter(p => p.category === category)
-    : perfumes;
+
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products', category],
+    queryFn: () => api.getProducts(category)
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: api.getCategories
+  });
 
   const categoryInfo = categories.find(c => c.slug === category);
-  const title = categoryInfo?.name || 'All Perfumes';
+  const title = categoryInfo?.name || (category === 'all' ? 'All Perfumes' : 'Products');
   const description = categoryInfo?.description || 'Explore our complete collection of luxury fragrances';
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1 pt-32 pb-20">
         <div className="container mx-auto px-4">
           {/* Header */}
@@ -32,14 +39,18 @@ const Shop = () => {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredPerfumes.map((perfume, index) => (
-              <ProductCard key={perfume.id} perfume={perfume} index={index} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center">Loading...</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {products.map((perfume, index) => (
+                <ProductCard key={perfume.id} perfume={perfume} index={index} />
+              ))}
+            </div>
+          )}
 
           {/* Empty State */}
-          {filteredPerfumes.length === 0 && (
+          {!isLoading && products.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground text-lg">No perfumes found in this category.</p>
             </div>

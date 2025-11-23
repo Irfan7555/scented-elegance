@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { perfumes } from "@/lib/data";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Heart, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 // Import all perfume images
 import perfumeWomen1 from "@/assets/perfume-women-1.jpg";
@@ -21,7 +22,24 @@ const imageMap: Record<string, string> = {
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const perfume = perfumes.find(p => p.id === id);
+
+  const { data: perfume, isLoading } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => api.getProduct(id!),
+    enabled: !!id
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">Loading...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!perfume) {
     return (
@@ -49,7 +67,7 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1 pt-32 pb-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
@@ -61,12 +79,11 @@ const ProductDetail = () => {
               className="relative aspect-square rounded-sm overflow-hidden bg-luxury-warm"
             >
               <img
-                src={imageMap[perfume.image]}
+                src={perfume.image.startsWith('http') ? perfume.image : imageMap[perfume.image]}
                 alt={perfume.name}
                 className="w-full h-full object-cover"
               />
             </motion.div>
-
             {/* Product Info */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
@@ -82,7 +99,7 @@ const ProductDetail = () => {
                   {perfume.name}
                 </h1>
                 <p className="text-lg text-muted-foreground mb-6">{perfume.brand}</p>
-                
+
                 <div className="text-3xl font-bold mb-8">{formattedPrice}</div>
 
                 <p className="text-muted-foreground leading-relaxed mb-8">
@@ -134,8 +151,8 @@ const ProductDetail = () => {
 
                 {/* Actions */}
                 <div className="flex gap-3 mb-4">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="flex-1 bg-luxury-gold hover:bg-luxury-gold/90 text-luxury-black"
                   >
                     <ShoppingBag className="w-5 h-5 mr-2" />
@@ -156,10 +173,10 @@ const ProductDetail = () => {
             </motion.div>
           </div>
         </div>
-      </main>
+      </main >
 
       <Footer />
-    </div>
+    </div >
   );
 };
 

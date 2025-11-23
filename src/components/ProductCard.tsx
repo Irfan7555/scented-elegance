@@ -39,7 +39,7 @@ export const ProductCard = ({ perfume, index = 0 }: ProductCardProps) => {
       <Link to={`/product/${perfume.id}`}>
         <div className="relative overflow-hidden rounded-sm bg-luxury-warm aspect-square mb-4">
           <img
-            src={imageMap[perfume.image]}
+            src={perfume.image.startsWith('http') ? perfume.image : imageMap[perfume.image]}
             alt={perfume.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -64,9 +64,9 @@ export const ProductCard = ({ perfume, index = 0 }: ProductCardProps) => {
           </div>
           <p className="font-medium whitespace-nowrap">{formattedPrice}</p>
         </div>
-        
-        <Button 
-          size="sm" 
+
+        <Button
+          size="sm"
           className="w-full bg-luxury-black hover:bg-luxury-gold text-luxury-cream hover:text-luxury-black transition-all"
         >
           <ShoppingBag className="w-4 h-4 mr-2" />
