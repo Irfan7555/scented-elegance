@@ -13,7 +13,16 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        serif: ['Playfair Display', 'serif'],
+        body: ['Outfit', 'sans-serif'],
+      },
       colors: {
+        'luxury-gold': 'hsl(var(--luxury-gold))',
+        'luxury-rose-gold': 'hsl(var(--luxury-rose-gold))',
+        'luxury-black': 'hsl(var(--luxury-black))',
+        'luxury-cream': 'hsl(var(--luxury-cream))',
+        'luxury-warm': 'hsl(var(--luxury-warm))',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
